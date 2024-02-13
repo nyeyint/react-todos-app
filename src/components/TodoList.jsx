@@ -65,7 +65,7 @@ function TodoList(props) {
         ) : (
           <li className="todo-item-container">
             <div className="todo-item">
-              <span>No result found</span>
+              <span className="text-light"> No result found ... </span>
             </div>
           </li>
         )}
