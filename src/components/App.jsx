@@ -8,17 +8,16 @@ import useLocalStorage from '../hooks/useLocalStorage';
 
 function App() {
   const [todos, setTodos] = useLocalStorage('todos', []);
-  const [inputTodoId, setInputTodoId] = useLocalStorage('todo_id', 1);
 
   const [filter, setFilter] = useState('all');
 
   const addTodo = (inputTodo) => {
+    let newTodoId = todos.length === 0 ? 1 : todos[todos.length - 1].id + 1;
+
     setTodos([
       ...todos,
-      { id: inputTodoId, text: inputTodo, isCompleted: false },
+      { id: newTodoId, text: inputTodo, isCompleted: false },
     ]);
-
-    setInputTodoId((prevInputTodoId) => prevInputTodoId + 1);
   };
 
   const handleUpdate = (e, id) => {
@@ -34,10 +33,6 @@ function App() {
 
   const deleteItem = (id) => () => {
     setTodos(todos.filter((todo) => todo.id !== id));
-
-    if (todos.length === 1) {
-      setInputTodoId(1);
-    }
   };
 
   const toogleCompleted = (id) => {
