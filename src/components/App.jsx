@@ -4,30 +4,12 @@ import { useState } from 'react';
 import NoTodoList from './NoTodoList';
 import TodoForm from './TodoForm';
 import TodoList from './TodoList';
+import useLocalStorage from '../hooks/useLocalStorage';
 
 function App() {
-  const [todos, setTodos] = useState([
-    {
-      id: 1,
-      text: 'Finish React Series',
-      isCompleted: false,
-      isEditing: false,
-    },
-    {
-      id: 2,
-      text: 'Go to Grocery',
-      isCompleted: true,
-      isEditing: false,
-    },
-    {
-      id: 3,
-      text: 'Do other thing',
-      isCompleted: false,
-      isEditing: false,
-    },
-  ]);
+  const [todos, setTodos] = useLocalStorage('todos', []);
+  const [inputTodoId, setInputTodoId] = useLocalStorage('todo_id', 1);
 
-  const [inputTodoId, setInputTodoId] = useState(4);
   const [filter, setFilter] = useState('all');
 
   const addTodo = (inputTodo) => {
@@ -52,6 +34,10 @@ function App() {
 
   const deleteItem = (id) => () => {
     setTodos(todos.filter((todo) => todo.id !== id));
+
+    if (todos.length === 1) {
+      setInputTodoId(1);
+    }
   };
 
   const toogleCompleted = (id) => {
