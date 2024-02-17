@@ -1,20 +1,73 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import RemainingItemCount from './RemainingItemCount';
 import ClearTodoCompleted from './ClearTodoCompleted';
 import CompleteAllTodos from './CompleteAllTodos';
 import TodoFilter from './TodoFilter';
+import TodosContext from '../context/TodosContext';
 
-function TodoList(props) {
+function TodoList() {
+  const { todos, setTodos, filter } = useContext(TodosContext);
+
+  const handleUpdate = (e, id) => {
+    const updatedTodos = todos.map((todo) => {
+      if (todo.id === id) {
+        return { ...todo, text: e.target.value, isEditing: false };
+      }
+      return todo;
+    });
+
+    setTodos(updatedTodos);
+  };
+
+  const deleteItem = (id) => () => {
+    setTodos(todos.filter((todo) => todo.id !== id));
+  };
+
+  const toogleCompleted = (id) => {
+    setTodos(
+      todos.map((todo) =>
+        todo.id === id ? { ...todo, isCompleted: !todo.isCompleted } : todo,
+      ),
+    );
+  };
+
+  const toogleEditing = (id) => {
+    if (todos.find((todo) => todo.id === id).isCompleted) {
+      alert('You cannot edit a completed task');
+      return;
+    }
+
+    setTodos(
+      todos.map((todo) =>
+        todo.id === id ? { ...todo, isEditing: !todo.isEditing } : todo,
+      ),
+    );
+  };
+
+  const todosFiltered = () => {
+    if (filter === 'all') {
+      return todos;
+    }
+
+    if (filter === 'active') {
+      return todos.filter((todo) => !todo.isCompleted);
+    }
+
+    if (filter === 'completed') {
+      return todos.filter((todo) => todo.isCompleted);
+    }
+  };
+
   return (
     <>
       <ul className="todo-list">
-        {props.todosFiltered(props.filter).length ? (
-          props.todosFiltered(props.filter).map((todo) => (
+        {todosFiltered().length ? (
+          todosFiltered().map((todo) => (
             <li className="todo-item-container" key={todo.id}>
               <div className="todo-item">
                 <input
                   type="checkbox"
-                  onChange={() => props.toogleCompleted(todo.id)}
+                  onChange={() => toogleCompleted(todo.id)}
                   checked={todo.isCompleted}
                 />
                 {todo.isEditing && (
@@ -23,13 +76,13 @@ function TodoList(props) {
                     type="text"
                     className="todo-item-input"
                     defaultValue={todo.text}
-                    onBlur={(e) => props.handleUpdate(e, todo.id)}
+                    onBlur={(e) => handleUpdate(e, todo.id)}
                     onKeyDown={(e) => {
                       if (e.key === 'Escape') {
-                        props.toogleEditing(todo.id);
+                        toogleEditing(todo.id);
                       }
                       if (e.key === 'Enter') {
-                        props.handleUpdate(e, todo.id);
+                        handleUpdate(e, todo.id);
                       }
                     }}
                   />
@@ -39,13 +92,13 @@ function TodoList(props) {
                     className={`todo-item-label ${
                       todo.isCompleted ? 'line-through' : ''
                     }`}
-                    onDoubleClick={() => props.toogleEditing(todo.id)}
+                    onDoubleClick={() => toogleEditing(todo.id)}
                   >
                     {todo.text}
                   </span>
                 )}
               </div>
-              <button className="x-button" onClick={props.deleteItem(todo.id)}>
+              <button className="x-button" onClick={deleteItem(todo.id)}>
                 <svg
                   className="x-button-icon"
                   fill="none"
@@ -72,14 +125,14 @@ function TodoList(props) {
       </ul>
 
       <div className="check-all-container">
-        <CompleteAllTodos completeAllTodos={props.completeAllTodos} />
-        <RemainingItemCount remaining={props.remaining} />
+        <CompleteAllTodos />
+        <RemainingItemCount />
       </div>
 
       <div className="other-buttons-container">
-        <TodoFilter filter={props.filter} setFilter={props.setFilter} />
+        <TodoFilter />
         <div>
-          <ClearTodoCompleted clearTodoCompleted={props.clearTodoCompleted} />
+          <ClearTodoCompleted />
         </div>
       </div>
     </>

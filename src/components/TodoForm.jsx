@@ -1,14 +1,25 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
+import TodosContext from '../context/TodosContext';
 
-function TodoForm(props) {
+function TodoForm() {
   const [inputTodo, setInputTodo] = useState('');
+  const { todos, setTodos } = useContext(TodosContext);
+
+  const addTodo = (inputTodo) => {
+    let newTodoId = todos.length === 0 ? 1 : todos[todos.length - 1].id + 1;
+
+    setTodos([
+      ...todos,
+      { id: newTodoId, text: inputTodo, isCompleted: false },
+    ]);
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
     if (inputTodo.trim() === '') return;
 
-    props.addTodo(inputTodo);
+    addTodo(inputTodo);
 
     setInputTodo('');
   };
